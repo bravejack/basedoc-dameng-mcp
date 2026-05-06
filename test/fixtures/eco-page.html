@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=0"/>
+<head prefix="og: http://ogp.me/ns#">
+  <meta charset="utf-8">
+  <title>通信加密 | 达梦技术文档</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://hexo.io/zh-cn/pm/communication-encryption.html">
+  <!-- Alternative links -->
+  
+    
+      <link rel="alternative" hreflang="zh-cn" href="https://hexo.io/zh-cn/zh-cn/pm/communication-encryption">
+    
+  
+  <!-- Icon -->
+
+  <link rel="stylesheet" href="https://download.dameng.com/eco/eco-lib-public/eco-markdown/md-article.css">
+  <link rel="stylesheet" href="https://download.dameng.com/eco/eco-lib-public/hljs/styles/github.min.css">
+  <script src="https://download.dameng.com/eco/eco-lib-public/hljs/highlight.load.min.js"></script>
+  <link rel="apple-touch-icon" sizes="57x57" href="/document/dm/icon/apple-touch-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/document/dm/icon/apple-touch-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/document/dm/icon/apple-touch-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/document/dm/icon/apple-touch-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/document/dm/icon/apple-touch-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/document/dm/icon/apple-touch-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/document/dm/icon/apple-touch-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/document/dm/icon/apple-touch-icon-152x152.png">
+  <link rel="icon" type="image/png" href="/document/dm/icon/favicon-196x196.png" sizes="196x196">
+  <link rel="icon" type="image/png" href="/document/dm/icon/favicon-160x160.png" sizes="160x160">
+  <link rel="icon" type="image/png" href="/document/dm/icon/favicon-96x96.png" sizes="96x96">
+  <link rel="icon" type="image/png" href="/document/dm/icon/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/document/dm/icon/favicon-32x32.png" sizes="32x32">
+  <meta name="msapplication-TileColor" content="#2f83cd">
+  <meta name="msapplication-TileImage" content="/document/dm/icon/mstile-144x144.png">
+  <!-- CSS -->
+  <!-- build:css build/css/navy.css -->
+  <link rel="stylesheet" href="/document/dm/css/navy.css?date=2026-05-06">
+  <!-- endbuild -->
+  <!-- 
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-lato@0.0.75/index.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css">
+   -->
+
+   <script>
+      window.addEventListener('load', () => {
+        if(window.location.pathname.indexOf('document-preview') >=0){
+          Array.from(document.getElementsByTagName('a'))
+            .forEach(v=>{
+              if(v.href && v.href.indexOf('document/'>=0))
+                v.href = v.href.replace('document/','document-preview/')
+            })
+        }
+      });
+   </script>
+  
+  <!-- RSS -->
+  <link rel="alternate" href="/document/dm/atom.xml" title="达梦技术文档" type="application/atom+xml">
+  <!-- Open Graph -->
+  <meta name="description" content="DM 提供两种通信加密方式：一基于传输层的 SSL 协议加密；二基于应用层的消息包加密。两个层次的加密互不影响，可以同时使用。因为任何一种加密方式都足够安全，而且双重加密会占用更多的数据库资源，所以通常情况下，没必要同时开启这两种加密。 当未采用通信加密时，为了提高安全性，数据库系统自动对登录消息中的用户名密码使用内部算法进行了简单的加解密操作，这里的简单加解密操作为使用 AES256_CFB">
+<meta property="og:type" content="website">
+<meta property="og:title" content="通信加密">
+<meta property="og:url" content="https://hexo.io/zh-cn/pm/communication-encryption">
+<meta property="og:site_name" content="达梦技术文档">
+<meta property="og:description" content="DM 提供两种通信加密方式：一基于传输层的 SSL 协议加密；二基于应用层的消息包加密。两个层次的加密互不影响，可以同时使用。因为任何一种加密方式都足够安全，而且双重加密会占用更多的数据库资源，所以通常情况下，没必要同时开启这两种加密。 当未采用通信加密时，为了提高安全性，数据库系统自动对登录消息中的用户名密码使用内部算法进行了简单的加解密操作，这里的简单加解密操作为使用 AES256_CFB">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-05-06T05:03:22.766Z">
+<meta property="article:modified_time" content="2026-05-06T05:03:22.766Z">
+<meta property="article:author" content="dameng">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="hexojs">
+<meta property="fb:admins" content="100000247608790">  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<!-- onscroll="myFunction" -->
+<body>
+  <div id="container">
+  <progress value="0" max="100" class="progress"></progress>
+    <header id="header">
+  <div id="header-inner">
+    <h1 id="logo-title" >
+
+      <style>
+      .logo-title-div{
+        width: 40px;
+        display: inline-block;
+        overflow: hidden;
+      }
+      </style>
+      <a href="/" style="text-decoration: none;">
+        <div class="logo-title-div">
+          <svg class="icon" aria-hidden="true">
+            <use xlink:href="#icon-damengwendang"></use>
+          </svg>
+        </div>
+        <span id ="logo-title-span" style="
+          color: white;
+          vertical-align: 9px;
+          text-decoration: none;
+          font-size: 22px;
+        "></span>
+        <script>
+          document.getElementById('logo-title-span').innerText = document.title.split('|').reverse()[0].trim()
+        </script>
+      </a>
+    </h1>
+    <h1 id="mobile-logo-title" >
+      <a href="/">
+        <svg class="icon" aria-hidden="true">
+          <use xlink:href="#icon-logo-blue"></use>
+        </svg>
+      </a>
+    </h1>
+    <nav id="main-nav" style="color: #fff;">
+      <a href="/document/dm/zh-cn/start/" class="main-nav-link">快速上手</a><a href="/document/dm/zh-cn/ops/" class="main-nav-link">运维指南</a><a href="/document/dm/zh-cn/app-dev/" class="main-nav-link">应用开发指南</a><a href="/document/dm/zh-cn/sql-dev/" class="main-nav-link">SQL 开发指南</a><a href="/document/dm/zh-cn/faq/" class="main-nav-link">常见问题</a><a href="/document/dm/zh-cn/pm/" class="main-nav-link is-active">产品手册</a>
+    </nav>
+    <div id="search-input">
+      <input id="search-word" placeholder="搜索文档" maxlength="255" >
+      <svg class="icon search-icon" aria-hidden="true">
+        <use xlink:href="#icon-search"></use>
+      </svg>
+      <svg class="icon clear-icon" aria-hidden="true">
+        <use xlink:href="#icon-eliminate"></use>
+      </svg>
+    </div>
+
+    <a id="mobile-nav-toggle">
+      <span class="mobile-nav-toggle-bar"></span>
+      <span class="mobile-nav-toggle-bar"></span>
+      <span class="mobile-nav-toggle-bar"></span>
+    </a>
+  </div>
+</header>
+<script>
+document.getElementById("search-word").onkeydown = function(e){
+  var theEvent = e || window.event;
+  var code = theEvent.keycode || theEvent.which || theEvent.charcode;
+  if (code == 13 && document.getElementById("search-word").value) {
+      window.open('/search/?value=' +  encodeURIComponent(document.getElementById("search-word").value.replace(/%/,'u0001'))+ '&searchType=0&searchPage=docs', '_blank')
+  }
+};
+document.querySelector(".search-icon").onclick = function(){
+  handleSearch();
+};
+
+function handleSearch() {
+  if (document.getElementById("search-word").value) {
+      window.open('/search/?value=' + encodeURIComponent(document.getElementById("search-word").value.replace(/%/,'u0001')) + '&searchType=0&searchPage=docs', '_blank')
+  }
+}
+
+</script>
+
+    <div id="content-wrap">
+  <div id="content" class="wrapper" style="margin-top: 67px;">
+    <div id="content-inner">
+      <aside id="sidebar" role="navigation">
+  <style>.othersite{height:0;overflow:hidden}</style>
+  <div class="othersite">
+    <a href="/cases/">案例</a>
+    <a href="/community/question/">问答</a>
+    <a href="/community/products/damengpai">一体机</a>
+    <a href="/community/topic/">专栏</a>
+  </div>
+  <div class="inner" style=" overflow-x: hidden; overflow-y: auto; margin-bottom: 40px; height: calc(100vh - 80px);">
+    
+          <div class="left-sidebar-link-group top" style="display: none;transition: all 0.3s ease-out;">
+            <a class="left-sidebar-link" onclick="toggel(this)" style="font-weight:800;">DM8 安装手册<i class="iconfont top-icon">&#xe6a0;</i></a>
+            <div style="padding-left:8px"><a style="display:block;padding-left:8px" href="installation-introduction.html" class="left-sidebar-link ">安装简介</a>
+<a style="display:block;padding-left:8px" href="install-uninstall.html" class="left-sidebar-link ">安装及卸载</a>
+<a style="display:block;padding-left:8px" href="license.html" class="left-sidebar-link ">许可证 (License) 的安装</a>
+<a style="display:block;padding-left:8px" href="dm8-tools.html" class="left-sidebar-link ">数据库配置工具使用说明</a>
+<a style="display:block;padding-left:8px" href="dm8-appendix.html" class="left-sidebar-link ">注意事项</a></div>
+          </div>
+          <div class="bar-border"></div>
+        
+
+          <div class="left-sidebar-link-group top" style="display: none;transition: all 0.3s ease-out;">
+            <a class="left-sidebar-link" onclick="toggel(this)" style="font-weight:800;">DM8 系统管理员手册<i class="iconfont top-icon">&#xe6a0;</i></a>
+            <div style="padding-left:8px"><a style="display:block;padding-left:8px" href="logical-structure.html" class="left-sidebar-link ">DM 逻辑结构概述</a>
+<a style="display:block;padding-left:8px" href="physical-storage.html" class="left-sidebar-link ">DM 物理存储结构</a>
+<a style="display:block;padding-left:8px" href="memory-structure.html" class="left-sidebar-link ">DM 内存结构</a>
+<a style="display:block;padding-left:8px" href="manage-threads.html" class="left-sidebar-link ">管理 DM 线程</a>
+<a style="display:block;padding-left:8px" href="system-administrator.html" class="left-sidebar-link ">DM 系统管理员</a>
+<a style="display:block;padding-left:8px" href="create-configure.html" class="left-sidebar-link ">创建和配置 DM 数据库</a>
+<a style="display:block;padding-left:8px" href="start-shut-down.html" class="left-sidebar-link ">启动和关闭数据库</a>
+<a style="display:block;padding-left:8px" href="manage-objects.html" class="left-sidebar-link ">管理模式对象的空间</a>
+<a style="display:block;padding-left:8px" href="management-table.html" class="left-sidebar-link ">管理表</a>
+<a style="display:block;padding-left:8px" href="manage-index.html" class="left-sidebar-link ">管理索引</a>
+<a style="display:block;padding-left:8px" href="manage-triggers.html" class="left-sidebar-link ">管理触发器</a>
+<a style="display:block;padding-left:8px" href="manage-views.html" class="left-sidebar-link ">管理视图、序列和同义词</a>
+<a style="display:block;padding-left:8px" href="management-pattern.html" class="left-sidebar-link ">模式对象的常规管理</a>
+<a style="display:block;padding-left:8px" href="database-management.html" class="left-sidebar-link ">数据库布局和存储管理</a>
+<a style="display:block;padding-left:8px" href="manage-partition.html" class="left-sidebar-link ">管理分区表和分区索引</a>
+<a style="display:block;padding-left:8px" href="manage-column-tables.html" class="left-sidebar-link ">管理列存储表</a>
+<a style="display:block;padding-left:8px" href="manage-table.html" class="left-sidebar-link ">管理堆表</a>
+<a style="display:block;padding-left:8px" href="full-text-search.html" class="left-sidebar-link ">全文检索</a>
+<a style="display:block;padding-left:8px" href="management-affairs.html" class="left-sidebar-link ">管理事务</a>
+<a style="display:block;padding-left:8px" href="tracking-resolution.html" class="left-sidebar-link ">问题跟踪和解决</a>
+<a style="display:block;padding-left:8px" href="dynamic-management.html" class="left-sidebar-link ">动态管理和性能视图</a>
+<a style="display:block;padding-left:8px" href="query-optimization.html" class="left-sidebar-link ">查询优化</a>
+<a style="display:block;padding-left:8px" href="sql-tuning.html" class="left-sidebar-link ">SQL 调优</a>
+<a style="display:block;padding-left:8px" href="recovery.html" class="left-sidebar-link ">故障恢复</a>
+<a style="display:block;padding-left:8px" href="version-upgrade.html" class="left-sidebar-link ">版本升级</a>
+<a style="display:block;padding-left:8px" href="dm8-admin-manual-appendix1.html" class="left-sidebar-link ">附录 1</a>
+<a style="display:block;padding-left:8px" href="dm8-admin-manual-appendix2.html" class="left-sidebar-link ">附录 2</a>
+<a style="display:block;padding-left:8px" href="dm8-admin-manual-appendix3.html" class="left-sidebar-link ">附录 3</a>
+<a style="display:block;padding-left:8px" href="dm8-admin-manual-appendix4.html" class="left-sidebar-link ">附录 4</a></div>
+          </div>
+          <div class="bar-border"></div>
+        
+
+          <div class="left-sidebar-link-group top" style="display: none;transition: all 0.3s ease-out;">
+            <a class="left-sidebar-link" onclick="toggel(this)" style="font-weight:800;">DM8 程序员手册<i class="iconfont top-icon">&#xe6a0;</i></a>
+            <div style="padding-left:8px"><a style="display:block;padding-left:8px" href="programmer-overview.html" class="left-sidebar-link ">概述</a>
+<a style="display:block;padding-left:8px" href="dpi-rogramming-guide.html" class="left-sidebar-link ">DPI 编程指南</a>
+<a style="display:block;padding-left:8px" href="odbc-rogramming-guide.html" class="left-sidebar-link ">DM ODBC 编程指南</a>
+<a style="display:block;padding-left:8px" href="jdbc-rogramming-guide.html" class="left-sidebar-link ">DM JDBC 编程指南</a>
+<a style="display:block;padding-left:8px" href="net-rogramming-guide.html" class="left-sidebar-link ">.NET Data Provider 编程指南</a>
+<a style="display:block;padding-left:8px" href="php-rogramming-guide.html" class="left-sidebar-link ">DM PHP 编程指南</a>
+<a style="display:block;padding-left:8px" href="fldr-rogramming-guide.html" class="left-sidebar-link ">DM FLDR 编程指南</a>
+<a style="display:block;padding-left:8px" href="dexp-dimp-jni-rogramming-guide.html" class="left-sidebar-link ">DM DEXP/DIMP JNI编程指南</a>
+<a style="display:block;padding-left:8px" href="logmnr-interface-instructions.html" class="left-sidebar-link ">Logmnr 接口使用说明</a>
+<a style="display:block;padding-left:8px" href="nodejs-rogramming-guide.html" class="left-sidebar-link ">DM Node.js 编程指南</a>
+<a style="display:block;padding-left:8px" href="go-rogramming-guide.html" class="left-sidebar-link ">DM Go 编程指南</a>
+<a style="display:block;padding-left:8px" href="xa-rogramming-guide.html" class="left-sidebar-link ">DM XA 编程指南</a>
+<a style="display:block;padding-left:8px" href="r2dbc-rogramming-guide.html" class="left-sidebar-link ">DM R2DBC编程指南</a>
+<a style="display:block;padding-left:8px" href="programmer-appendix.html" class="left-sidebar-link ">附录</a></div>
+          </div>
+          <div class="bar-border"></div>
+        
+
+          <div class="left-sidebar-link-group top" style="display: none;transition: all 0.3s ease-out;">
+            <a class="left-sidebar-link" onclick="toggel(this)" style="font-weight:800;">DM8 SQL 语言使用手册<i class="iconfont top-icon">&#xe6a0;</i></a>
+            <div style="padding-left:8px"><a style="display:block;padding-left:8px" href="dm_sql-introduction.html" class="left-sidebar-link ">结构化查询语言 DM_SQL 简介</a>
+<a style="display:block;padding-left:8px" href="example-description.html" class="left-sidebar-link ">手册中的示例说明</a>
+<a style="display:block;padding-left:8px" href="definition-statement.html" class="left-sidebar-link ">数据定义语句</a>
+<a style="display:block;padding-left:8px" href="check-phrases.html" class="left-sidebar-link ">数据查询语句</a>
+<a style="display:block;padding-left:8px" href="insertion-deletion-modification.html" class="left-sidebar-link ">数据的插入、删除和修改</a>
+<a style="display:block;padding-left:8px" href="view.html" class="left-sidebar-link ">视图</a>
+<a style="display:block;padding-left:8px" href="materialized-view.html" class="left-sidebar-link ">物化视图</a>
+<a style="display:block;padding-left:8px" href="function.html" class="left-sidebar-link ">函数</a>
+<a style="display:block;padding-left:8px" href="consistency-concurrency.html" class="left-sidebar-link ">一致性和并发性</a>
+<a style="display:block;padding-left:8px" href="external-function.html" class="left-sidebar-link ">外部函数</a>
+<a style="display:block;padding-left:8px" href="package.html" class="left-sidebar-link ">包</a>
+<a style="display:block;padding-left:8px" href="class-type.html" class="left-sidebar-link ">类类型</a>
+<a style="display:block;padding-left:8px" href="custom-type.html" class="left-sidebar-link ">自定义类型</a>
+<a style="display:block;padding-left:8px" href="trigger.html" class="left-sidebar-link ">触发器</a>
+<a style="display:block;padding-left:8px" href="synonym.html" class="left-sidebar-link ">同义词</a>
+<a style="display:block;padding-left:8px" href="external-link.html" class="left-sidebar-link ">外部链接</a>
+<a style="display:block;padding-left:8px" href="flashback-query.html" class="left-sidebar-link ">闪回</a>
+<a style="display:block;padding-left:8px" href="json.html" class="left-sidebar-link ">JSON</a>
+<a style="display:block;padding-left:8px" href="advanced-log.html" class="left-sidebar-link ">高级日志</a>
+<a style="display:block;padding-left:8px" href="user-defined-operators.html" class="left-sidebar-link ">自定义运算符</a>
+<a style="display:block;padding-left:8px" href="Custom-functions.html" class="left-sidebar-link ">自定义集函数</a>
+<a style="display:block;padding-left:8px" href="xml-data-analysis.html" class="left-sidebar-link ">XML数据解析</a>
+<a style="display:block;padding-left:8px" href="sql-appendix.html" class="left-sidebar-link ">附录</a></div>
+          </div>
+          <div class="bar-border"></div>
+        
+
+          <div class="left-sidebar-link-group top" style="display: none;transition: all 0.3s ease-out;">
+            <a class="left-sidebar-link" onclick="toggel(this)" style="font-weight:800;">DM8 DIsql 使用手册<i class="iconfont top-icon">&#xe6a0;</i></a>
+            <div style="padding-left:8px"><a style="display:block;padding-left:8px" href="function-introduction.html" class="left-sidebar-link ">功能简介</a>
+<a style="display:block;padding-left:8px" href="getting-started-disql.html" class="left-sidebar-link ">DIsql 入门</a>
+<a style="display:block;padding-left:8px" href="environment-variable-settings.html" class="left-sidebar-link ">DIsql 环境变量设置</a>
+<a style="display:block;padding-left:8px" href="common-commands.html" class="left-sidebar-link ">DIsql 常用命令</a>
+<a style="display:block;padding-left:8px" href="disql-script.html" class="left-sidebar-link ">如何在 DIsql 中使用脚本</a></div>
+          </div>
+          <div class="bar-border"></div>
+        
+
+          <div class="left-sidebar-link-group top" style="display: none;transition: all 0.3s ease-out;">
+            <a class="left-sidebar-link" onclick="toggel(this)" style="font-weight:800;">DM8 dexp 和 dimp 手册<i class="iconfont top-icon">&#xe6a0;</i></a>
+            <div style="padding-left:8px"><a style="display:block;padding-left:8px" href="dexp-dimp-function-introduction.html" class="left-sidebar-link ">功能简介</a>
+<a style="display:block;padding-left:8px" href="dexp-logical-export.html" class="left-sidebar-link ">dexp 逻辑导出</a>
+<a style="display:block;padding-left:8px" href="dimp-logical import.html" class="left-sidebar-link ">dimp 逻辑导入</a>
+<a style="display:block;padding-left:8px" href="dexp-dimp-applications.html" class="left-sidebar-link ">dexp 和 dimp 应用实例</a>
+<a style="display:block;padding-left:8px" href="Promotion-demotion.html" class="left-sidebar-link ">升级和降级</a></div>
+          </div>
+          <div class="bar-border"></div>
+        
+
+          <div class="left-sidebar-link-group top" style="display: none;transition: all 0.3s ease-out;">
+            <a class="left-sidebar-link" onclick="toggel(this)" style="font-weight:800;">DM8 快速装载工具使用手册<i class="iconfont top-icon">&#xe6a0;</i></a>
+            <div style="padding-left:8px"><a style="display:block;padding-left:8px" href="dmfldr-overview.html" class="left-sidebar-link ">概述</a>
+<a style="display:block;padding-left:8px" href="getting-started-dmfldr.html" class="left-sidebar-link ">dmfldr 入门</a>
+<a style="display:block;padding-left:8px" href="actual-combat-dmfldr.html" class="left-sidebar-link ">dmfldr 实战</a>
+<a style="display:block;padding-left:8px" href="dmldrp-dmldrc-introduction.html" class="left-sidebar-link ">dmldrp和dmldrc入门</a>
+<a style="display:block;padding-left:8px" href="dmldrp-dmldrc-draft.html" class="left-sidebar-link ">dmldrp和dmldrc实战</a></div>
+          </div>
+          <div class="bar-border"></div>
+        
+
+          <div class="left-sidebar-link-group top" style="display: none;transition: all 0.3s ease-out;">
+            <a class="left-sidebar-link" onclick="toggel(this)" style="font-weight:800;">DM8 dminit 使用手册<i class="iconfont top-icon">&#xe6a0;</i></a>
+            <div style="padding-left:8px"><a style="display:block;padding-left:8px" href="dminit-function-introduction.html" class="left-sidebar-link ">功能简介</a>
+<a style="display:block;padding-left:8px" href="use-dminit.html" class="left-sidebar-link ">使用 dminit</a>
+<a style="display:block;padding-left:8px" href="view-dminit-parameters.html" class="left-sidebar-link ">查看 dminit 参数</a>
+<a style="display:block;padding-left:8px" href="dminit-parameters.html" class="left-sidebar-link ">dminit 参数详解</a>
+<a style="display:block;padding-left:8px" href="dminit-advanced-topics.html" class="left-sidebar-link ">dminit 高级主题</a></div>
+          </div>
+          <div class="bar-border"></div>
+        
+
+          <div class="left-sidebar-link-group top" style="display: none;transition: all 0.3s ease-out;">
+            <a class="left-sidebar-link" onclick="toggel(this)" style="font-weight:800;">DM8 dmPython 使用手册<i class="iconfont top-icon">&#xe6a0;</i></a>
+            <div style="padding-left:8px"><a style="display:block;padding-left:8px" href="dmpython-introduction.html" class="left-sidebar-link ">dmPython 简介</a>
+<a style="display:block;padding-left:8px" href="dmpython-installation.html" class="left-sidebar-link ">dmPython 安装</a>
+<a style="display:block;padding-left:8px" href="dmpython-interface.html" class="left-sidebar-link ">dmPython 接口详解</a>
+<a style="display:block;padding-left:8px" href="dmdjango-drive.html" class="left-sidebar-link ">dmDjango 驱动</a>
+<a style="display:block;padding-left:8px" href="dmsqlalchemy-dialect-package.html" class="left-sidebar-link ">dmSQLAlchemy 方言包</a>
+<a style="display:block;padding-left:8px" href="dbutils-package.html" class="left-sidebar-link ">DBUtils 包</a>
+<a style="display:block;padding-left:8px" href="dmasync-package.html" class="left-sidebar-link ">dmAsync 包</a></div>
+          </div>
+          <div class="bar-border"></div>
+        
+
+          <div class="left-sidebar-link-group top" style="display: none;transition: all 0.3s ease-out;">
+            <a class="left-sidebar-link" onclick="toggel(this)" style="font-weight:800;">DM8 Linux 脚本使用手册<i class="iconfont top-icon">&#xe6a0;</i></a>
+            <div style="padding-left:8px"><a style="display:block;padding-left:8px" href="dm8_linux-script-manual.html" class="left-sidebar-link ">DM8 Linux 脚本使用手册</a></div>
+          </div>
+          <div class="bar-border"></div>
+        
+
+          <div class="left-sidebar-link-group top" style="display: none;transition: all 0.3s ease-out;">
+            <a class="left-sidebar-link" onclick="toggel(this)" style="font-weight:800;">DM8 PROC 使用手册<i class="iconfont top-icon">&#xe6a0;</i></a>
+            <div style="padding-left:8px"><a style="display:block;padding-left:8px" href="proc-overview.html" class="left-sidebar-link ">概述</a>
+<a style="display:block;padding-left:8px" href="precompiled-concept.html" class="left-sidebar-link ">预编译概念</a>
+<a style="display:block;padding-left:8px" href="embedded-program.html" class="left-sidebar-link ">嵌入式程序的组成</a>
+<a style="display:block;padding-left:8px" href="oracle-compatible.html" class="left-sidebar-link ">Oracle 兼容</a>
+<a style="display:block;padding-left:8px" href="db2-compatible.html" class="left-sidebar-link ">DB2 兼容</a>
+<a style="display:block;padding-left:8px" href="embedded-sql.html" class="left-sidebar-link ">DM 嵌入式 SQL 高级功能</a>
+<a style="display:block;padding-left:8px" href="proc-program-example.html" class="left-sidebar-link ">PRO*C 程序实例</a>
+<a style="display:block;padding-left:8px" href="proc-appendix.html" class="left-sidebar-link ">附录</a></div>
+          </div>
+          <div class="bar-border"></div>
+        
+
+          <div class="left-sidebar-link-group top" style="display: none;transition: all 0.3s ease-out;">
+            <a class="left-sidebar-link" onclick="toggel(this)" style="font-weight:800;">DM8 SQL 程序设计<i class="iconfont top-icon">&#xe6a0;</i></a>
+            <div style="padding-left:8px"><a style="display:block;padding-left:8px" href="dm8_sql-overview.html" class="left-sidebar-link ">概述</a>
+<a style="display:block;padding-left:8px" href="dm8_sql-data-types-operators.html" class="left-sidebar-link ">DMSQL 程序数据类型与操作符</a>
+<a style="display:block;padding-left:8px" href="dm8_sql-definition-deletion.html" class="left-sidebar-link ">DMSQL 程序的定义、调用与删除</a>
+<a style="display:block;padding-left:8px" href="dm8_sql-various-control.html" class="left-sidebar-link ">DMSQL 程序中的各种控制结构</a>
+<a style="display:block;padding-left:8px" href="dm8_sql-sql-statement.html" class="left-sidebar-link ">DMSQL 程序中的 SQL 语句</a>
+<a style="display:block;padding-left:8px" href="dm8_sql-exception-handling.html" class="left-sidebar-link ">DMSQL 程序异常处理</a>
+<a style="display:block;padding-left:8px" href="dm8_sql-c-java.html" class="left-sidebar-link ">基于 C、JAVA 语法的 DMSQL 程序</a>
+<a style="display:block;padding-left:8px" href="dm8_sql-debug.html" class="left-sidebar-link ">DMSQL 程序调试</a></div>
+          </div>
+          <div class="bar-border"></div>
+        
+
+          <div class="left-sidebar-link-group top" style="display: none;transition: all 0.3s ease-out;">
+            <a class="left-sidebar-link" onclick="toggel(this)" style="font-weight:800;">DM8 dmdbchk 使用手册<i class="iconfont top-icon">&#xe6a0;</i></a>
+            <div style="padding-left:8px"><a style="display:block;padding-left:8px" href="dm8-dmdbchk-manual.html" class="left-sidebar-link ">DM8 dmdbchk 使用手册</a></div>
+          </div>
+          <div class="bar-border"></div>
+        
+
+          <div class="left-sidebar-link-group top" style="display: none;transition: all 0.3s ease-out;">
+            <a class="left-sidebar-link" onclick="toggel(this)" style="font-weight:800;">DM8 安全管理<i class="iconfont top-icon">&#xe6a0;</i></a>
+            <div style="padding-left:8px"><a style="display:block;padding-left:8px" href="dm8-safety-overview.html" class="left-sidebar-link ">概述</a>
+<a style="display:block;padding-left:8px" href="identification-authentication.html" class="left-sidebar-link ">用户标识与鉴别</a>
+<a style="display:block;padding-left:8px" href="discretionary-access-control.html" class="left-sidebar-link ">自主访问控制</a>
+<a style="display:block;padding-left:8px" href="mandatory-access-control.html" class="left-sidebar-link ">强制访问控制</a>
+<a style="display:block;padding-left:8px" href="audit.html" class="left-sidebar-link ">审计</a>
+<a style="display:block;padding-left:8px" href="communication-encryption.html" class="left-sidebar-link current">通信加密</a>
+<a style="display:block;padding-left:8px" href="storage-encryption.html" class="left-sidebar-link ">存储加密</a>
+<a style="display:block;padding-left:8px" href="encryption-engine.html" class="left-sidebar-link ">加密引擎</a>
+<a style="display:block;padding-left:8px" href="resource-limit.html" class="left-sidebar-link ">资源限制</a>
+<a style="display:block;padding-left:8px" href="guest-weight.html" class="left-sidebar-link ">客体重用</a>
+<a style="display:block;padding-left:8px" href="user-name-password.html" class="left-sidebar-link ">登录用户名密码增强加密</a>
+<a style="display:block;padding-left:8px" href="username-password-external-storage.html" class="left-sidebar-link ">登录用户名密码外部存储</a>
+<a style="display:block;padding-left:8px" href="dm8-safety-appendix.html" class="left-sidebar-link ">附录</a></div>
+          </div>
+          <div class="bar-border"></div>
+        
+
+          <div class="left-sidebar-link-group top" style="display: none;transition: all 0.3s ease-out;">
+            <a class="left-sidebar-link" onclick="toggel(this)" style="font-weight:800;">DM8 备份与还原<i class="iconfont top-icon">&#xe6a0;</i></a>
+            <div style="padding-left:8px"><a style="display:block;padding-left:8px" href="backup-restore-introduction.html" class="left-sidebar-link ">备份还原简介</a>
+<a style="display:block;padding-left:8px" href="backup-restore-principle.html" class="left-sidebar-link ">备份还原原理</a>
+<a style="display:block;padding-left:8px" href="backup-restore-combat.html" class="left-sidebar-link ">备份还原实战</a></div>
+          </div>
+          <div class="bar-border"></div>
+        
+
+          <div class="left-sidebar-link-group top" style="display: none;transition: all 0.3s ease-out;">
+            <a class="left-sidebar-link" onclick="toggel(this)" style="font-weight:800;">DM8 大规模并行处理MPP<i class="iconfont top-icon">&#xe6a0;</i></a>
+            <div style="padding-left:8px"><a style="display:block;padding-left:8px" href="dm8-mpp-foreword.html" class="left-sidebar-link ">引言</a>
+<a style="display:block;padding-left:8px" href="dm8-mpp-overview.html" class="left-sidebar-link ">概述</a>
+<a style="display:block;padding-left:8px" href="basic-concepts-principles.html" class="left-sidebar-link ">基本概念与原理</a>
+<a style="display:block;padding-left:8px" href="environment-construction.html" class="left-sidebar-link ">DM MPP 环境搭建与使用</a>
+<a style="display:block;padding-left:8px" href="dm8-mpp-active-standby.html" class="left-sidebar-link ">DM MPP 主备系统</a>
+<a style="display:block;padding-left:8px" href="dm8-mpp-system.html" class="left-sidebar-link ">DM MPP 系统管理</a>
+<a style="display:block;padding-left:8px" href="dynamic_view.html" class="left-sidebar-link ">动态视图</a></div>
+          </div>
+          <div class="bar-border"></div>
+        
+
+          <div class="left-sidebar-link-group top" style="display: none;transition: all 0.3s ease-out;">
+            <a class="left-sidebar-link" onclick="toggel(this)" style="font-weight:800;">DM8 数据共享集群<i class="iconfont top-icon">&#xe6a0;</i></a>
+            <div style="padding-left:8px"><a style="display:block;padding-left:8px" href="dsc-overview.html" class="left-sidebar-link ">DMDSC 概述</a>
+<a style="display:block;padding-left:8px" href="dsc-surroundings.html" class="left-sidebar-link ">DMDSC 使用的环境</a>
+<a style="display:block;padding-left:8px" href="dsc-technology.html" class="left-sidebar-link ">DMDSC 关键技术</a>
+<a style="display:block;padding-left:8px" href="css-introduction.html" class="left-sidebar-link ">DMCSS 介绍</a>
+<a style="display:block;padding-left:8px" href="dsc-startup-shutdown.html" class="left-sidebar-link ">DMDSC 的启动与退出</a>
+<a style="display:block;padding-left:8px" href="dsc-fault-handling.html" class="left-sidebar-link ">DMDSC 故障处理</a>
+<a style="display:block;padding-left:8px" href="dsc-node.html" class="left-sidebar-link ">DMDSC 节点重加入</a>
+<a style="display:block;padding-left:8px" href="dsc-configuration-instructions.html" class="left-sidebar-link ">DMDSC 配置文件</a>
+<a style="display:block;padding-left:8px" href="dmasm-introduce.html" class="left-sidebar-link ">DMASM 介绍</a>
+<a style="display:block;padding-left:8px" href="dmasm-image-introduction.html" class="left-sidebar-link ">DMASM 镜像介绍</a>
+<a style="display:block;padding-left:8px" href="dsc-build.html" class="left-sidebar-link ">DMDSC 搭建</a>
+<a style="display:block;padding-left:8px" href="skill-servicename.html" class="left-sidebar-link ">巧用服务名</a>
+<a style="display:block;padding-left:8px" href="dynamically-expand-nodes.html" class="left-sidebar-link ">动态增加节点</a>
+<a style="display:block;padding-left:8px" href="dsc-monitor.html" class="left-sidebar-link ">监控 DMDSC</a>
+<a style="display:block;padding-left:8px" href="dsc-backup-restore.html" class="left-sidebar-link ">备份还原</a>
+<a style="display:block;padding-left:8px" href="dsc-instructions-use.html" class="left-sidebar-link ">DMDSC 注意事项</a>
+<a style="display:block;padding-left:8px" href="dsc-version-upgrade.html" class="left-sidebar-link ">版本升级</a>
+<a style="display:block;padding-left:8px" href="dsc-appendix.html" class="left-sidebar-link ">附录</a></div>
+          </div>
+          <div class="bar-border"></div>
+        
+
+          <div class="left-sidebar-link-group top" style="display: none;transition: all 0.3s ease-out;">
+            <a class="left-sidebar-link" onclick="toggel(this)" style="font-weight:800;">DM8 数据守护与读写分离集群<i class="iconfont top-icon">&#xe6a0;</i></a>
+            <div style="padding-left:8px"><a style="display:block;padding-left:8px" href="data-watch-overview.html" class="left-sidebar-link ">概述</a>
+<a style="display:block;padding-left:8px" href="data-watch-daemon.html" class="left-sidebar-link ">守护进程</a>
+<a style="display:block;padding-left:8px" href="data-watch-monitor.html" class="left-sidebar-link ">监视器</a>
+<a style="display:block;padding-left:8px" href="configuration-description.html" class="left-sidebar-link ">配置文件说明</a>
+<a style="display:block;padding-left:8px" href="data-guard.html" class="left-sidebar-link ">数据守护使用说明</a>
+<a style="display:block;padding-left:8px" href="data-guard-construction.html" class="left-sidebar-link ">数据守护搭建</a>
+<a style="display:block;padding-left:8px" href="dem-tools.html" class="left-sidebar-link ">利用 DEM 工具搭建数据守护</a>
+<a style="display:block;padding-left:8px" href="data-watch-version-upgrade.html" class="left-sidebar-link ">版本升级</a>
+<a style="display:block;padding-left:8px" href="data-watch-appendix.html" class="left-sidebar-link ">附录</a></div>
+          </div>
+          <div class="bar-border"></div>
+        
+
+          <div class="left-sidebar-link-group top" style="display: none;transition: all 0.3s ease-out;">
+            <a class="left-sidebar-link" onclick="toggel(this)" style="font-weight:800;">DM8 系统包使用手册<i class="iconfont top-icon">&#xe6a0;</i></a>
+            <div style="padding-left:8px"><a style="display:block;padding-left:8px" href="package-overview.html" class="left-sidebar-link ">概述</a>
+<a style="display:block;padding-left:8px" href="dbms_advances_rewrite-package.html" class="left-sidebar-link ">DBMS_ADVANCED_REWRITE包</a>
+<a style="display:block;padding-left:8px" href="dbms_alter-package.html" class="left-sidebar-link ">DBMS_ALERT 包</a>
+<a style="display:block;padding-left:8px" href="dbms_binary-package.html" class="left-sidebar-link ">DBMS_BINARY 包</a>
+<a style="display:block;padding-left:8px" href="dbms_job-package.html" class="left-sidebar-link ">DBMS_JOB 包</a>
+<a style="display:block;padding-left:8px" href="dbms_lob-package.html" class="left-sidebar-link ">DBMS_LOB 包</a>
+<a style="display:block;padding-left:8px" href="dbms_lock-package.html" class="left-sidebar-link ">DBMS_LOCK 包</a>
+<a style="display:block;padding-left:8px" href="dbms_logmnr-package.html" class="left-sidebar-link ">DBMS_LOGMNR 包</a>
+<a style="display:block;padding-left:8px" href="dbms_metadata-package.html" class="left-sidebar-link ">DBMS_METADATA 包</a>
+<a style="display:block;padding-left:8px" href="dbms_obfuscation_toolkit-package.html" class="left-sidebar-link ">DBMS_OBFUSCATION_TOOLKIT 包</a>
+<a style="display:block;padding-left:8px" href="dbms_output-package.html" class="left-sidebar-link ">DBMS_OUTPUT包</a>
+<a style="display:block;padding-left:8px" href="dbms_pipe-package.html" class="left-sidebar-link ">DBMS_PIPE 包</a>
+<a style="display:block;padding-left:8px" href="dbms_random-package.html" class="left-sidebar-link ">DBMS_RANDOM 包</a>
+<a style="display:block;padding-left:8px" href="dbms_rls-package.html" class="left-sidebar-link ">DBMS_RLS 包</a>
+<a style="display:block;padding-left:8px" href="dbms_session-package.html" class="left-sidebar-link ">DBMS_SESSION 包</a>
+<a style="display:block;padding-left:8px" href="dbms_space-package.html" class="left-sidebar-link ">DBMS_SPACE 包</a>
+<a style="display:block;padding-left:8px" href="dbms_sql-package.html" class="left-sidebar-link ">DBMS_SQL 包</a>
+<a style="display:block;padding-left:8px" href="dbms_transaction-package.html" class="left-sidebar-link ">DBMS_TRANSACTION 包</a>
+<a style="display:block;padding-left:8px" href="dbms_stats-package.html" class="left-sidebar-link ">DBMS_STATS 包</a>
+<a style="display:block;padding-left:8px" href="dbms_utility-package.html" class="left-sidebar-link ">DBMS_UTILITY 包</a>
+<a style="display:block;padding-left:8px" href="dbms_workload-package.html" class="left-sidebar-link ">DBMS_WORKLOAD_REPOSITORY 包</a>
+<a style="display:block;padding-left:8px" href="dbms_xmlgen-package.html" class="left-sidebar-link ">DBMS_XMLGEN 包</a>
+<a style="display:block;padding-left:8px" href="utl_encode-package.html" class="left-sidebar-link ">UTL_ENCODE 包</a>
+<a style="display:block;padding-left:8px" href="utl_file-package.html" class="left-sidebar-link ">UTL_FILE 包</a>
+<a style="display:block;padding-left:8px" href="utl_inaddr-package.html" class="left-sidebar-link ">UTL_INADDR 包</a>
+<a style="display:block;padding-left:8px" href="utl_mail-package.html" class="left-sidebar-link ">UTL_MAIL 包</a>
+<a style="display:block;padding-left:8px" href="utl_match-package.html" class="left-sidebar-link ">UTL_MATCH 包</a>
+<a style="display:block;padding-left:8px" href="utl_raw-package.html" class="left-sidebar-link ">UTL_RAW 包</a>
+<a style="display:block;padding-left:8px" href="utl_tcp-package.html" class="left-sidebar-link ">UTL_TCP 包</a>
+<a style="display:block;padding-left:8px" href="utl_url-package.html" class="left-sidebar-link ">UTL_URL 包</a>
+<a style="display:block;padding-left:8px" href="dbms_scheduler-package.html" class="left-sidebar-link ">DBMS_SCHEDULER 包</a>
+<a style="display:block;padding-left:8px" href="dbms_mview-package.html" class="left-sidebar-link ">DBMS_MVIEW 包</a>
+<a style="display:block;padding-left:8px" href="utl_smtp-package.html" class="left-sidebar-link ">UTL_SMTP 包</a>
+<a style="display:block;padding-left:8px" href="utl_http-package.html" class="left-sidebar-link ">UTL_HTTP 包</a>
+<a style="display:block;padding-left:8px" href="utl_t18n-package.html" class="left-sidebar-link ">UTL_I18N 包</a>
+<a style="display:block;padding-left:8px" href="dbms_aqadm-package.html" class="left-sidebar-link ">DBMS_AQADM 包</a>
+<a style="display:block;padding-left:8px" href="dbms_aq-package.html" class="left-sidebar-link ">DBMS_AQ 包</a>
+<a style="display:block;padding-left:8px" href="dbms_sqltume-package.html" class="left-sidebar-link ">DBMS_SQLTUNE 包</a>
+<a style="display:block;padding-left:8px" href="dbms_crypto-package.html" class="left-sidebar-link ">DBMS_CRYPTO 包</a>
+<a style="display:block;padding-left:8px" href="dbms_errlog-package.html" class="left-sidebar-link ">DBMS_ERRLOG 包</a>
+<a style="display:block;padding-left:8px" href="utl_compress-package.html" class="left-sidebar-link ">UTL_COMPRESS 包</a>
+<a style="display:block;padding-left:8px" href="dbms_application_info-package.html" class="left-sidebar-link ">DBMS_APPLICATION_INFO包</a>
+<a style="display:block;padding-left:8px" href="dbms_redefinition-package.html" class="left-sidebar-link ">DBMS_REDEFINITION包</a>
+<a style="display:block;padding-left:8px" href="dbms_xa-package.html" class="left-sidebar-link ">DBMS_XA包</a>
+<a style="display:block;padding-left:8px" href="dbms_xmldom-package.html" class="left-sidebar-link ">DBMS_XMLDOM包</a>
+<a style="display:block;padding-left:8px" href="dbms_debug-package.html" class="left-sidebar-link ">DBMS_DEBUG包</a>
+<a style="display:block;padding-left:8px" href="odciconst-package.html" class="left-sidebar-link ">ODCICONST 包</a>
+<a style="display:block;padding-left:8px" href="dbms_json-package.html" class="left-sidebar-link ">DBMS_JSON 包</a>
+<a style="display:block;padding-left:8px" href="dbms_flashback-package.html" class="left-sidebar-link ">DBMS_FLASHBACK 包</a>
+<a style="display:block;padding-left:8px" href="dbms_system-package.html" class="left-sidebar-link ">DBMS_SYSTEM包</a>
+<a style="display:block;padding-left:8px" href="dbms_audit-package.html" class="left-sidebar-link ">DBMS_AUDIT 包</a>
+<a style="display:block;padding-left:8px" href="dbms_xplan-package.html" class="left-sidebar-link ">DBMS_XPLAN 包</a>
+<a style="display:block;padding-left:8px" href="dbms_ddl-package.html" class="left-sidebar-link ">DBMS_DDL 包</a>
+<a style="display:block;padding-left:8px" href="dbms_ldap-package.html" class="left-sidebar-link ">DBMS_LDAP 包</a>
+<a style="display:block;padding-left:8px" href="dbms_xmlparser-package.html" class="left-sidebar-link ">DBMS_XMLPARSER包</a></div>
+          </div>
+          <div class="bar-border"></div>
+        
+
+          <div class="left-sidebar-link-group top" style="display: none;transition: all 0.3s ease-out;">
+            <a class="left-sidebar-link" onclick="toggel(this)" style="font-weight:800;">DM8 作业系统使用手册<i class="iconfont top-icon">&#xe6a0;</i></a>
+            <div style="padding-left:8px"><a style="display:block;padding-left:8px" href="operation-function-introduction.html" class="left-sidebar-link ">功能简介</a>
+<a style="display:block;padding-left:8px" href="create-job-environment.html" class="left-sidebar-link ">创建作业环境</a>
+<a style="display:block;padding-left:8px" href="operator.html" class="left-sidebar-link ">操作员</a>
+<a style="display:block;padding-left:8px" href="job.html" class="left-sidebar-link ">作业</a>
+<a style="display:block;padding-left:8px" href="alarm.html" class="left-sidebar-link ">警报</a>
+<a style="display:block;padding-left:8px" href="monitoring-job.html" class="left-sidebar-link ">监控作业</a>
+<a style="display:block;padding-left:8px" href="typical-example.html" class="left-sidebar-link ">一个典型示例</a></div>
+          </div>
+          <div class="bar-border"></div>
+        
+
+          <div class="left-sidebar-link-group top" style="display: none;transition: all 0.3s ease-out;">
+            <a class="left-sidebar-link" onclick="toggel(this)" style="font-weight:800;">DM8 分布计算集群<i class="iconfont top-icon">&#xe6a0;</i></a>
+            <div style="padding-left:8px"><a style="display:block;padding-left:8px" href="dmdpc-introduction.html" class="left-sidebar-link ">DMDPC 概述</a>
+<a style="display:block;padding-left:8px" href="dpc-basic-technical-concepts.html" class="left-sidebar-link ">基本概念和技术指标</a>
+<a style="display:block;padding-left:8px" href="dpc-terms-use.html" class="left-sidebar-link ">DMDPC使用须知</a>
+<a style="display:block;padding-left:8px" href="dpc-key-technology.html" class="left-sidebar-link ">DMDPC的关键技术</a>
+<a style="display:block;padding-left:8px" href="dpc-dispose.html" class="left-sidebar-link ">DMDPC配置</a>
+<a style="display:block;padding-left:8px" href="dpc-cluster-deploy.html" class="left-sidebar-link ">DMDPC 集群部署</a>
+<a style="display:block;padding-left:8px" href="dpc-cluster-management-use.html" class="left-sidebar-link ">DMDPC 集群的管理与使用</a>
+<a style="display:block;padding-left:8px" href="dpc-quick-loading-tool.html" class="left-sidebar-link ">快速装载工具</a>
+<a style="display:block;padding-left:8px" href="dpc-query-analysis.html" class="left-sidebar-link ">查询分析</a>
+<a style="display:block;padding-left:8px" href="dpc-sql-tuning.html" class="left-sidebar-link ">SQL调优</a>
+<a style="display:block;padding-left:8px" href="dpc-system_table-dynamic_view.html" class="left-sidebar-link ">相关系统表和动态视图</a></div>
+          </div>
+          <div class="bar-border"></div>
+        
+
+          <div class="left-sidebar-link-group top" style="display: none;transition: all 0.3s ease-out;">
+            <a class="left-sidebar-link" onclick="toggel(this)" style="font-weight:800;">DM8 数据迁移工具 DTS<i class="iconfont top-icon">&#xe6a0;</i></a>
+            <div style="padding-left:8px"><a style="display:block;padding-left:8px" href="dts_function_introduction.html" class="left-sidebar-link ">DTS 功能简介</a>
+<a style="display:block;padding-left:8px" href="introduction_to_dts.html" class="left-sidebar-link ">DTS 入门</a>
+<a style="display:block;padding-left:8px" href="dts_agent.html" class="left-sidebar-link ">DTS 代理</a>
+<a style="display:block;padding-left:8px" href="dts_migrate.html" class="left-sidebar-link ">DTS 迁移</a>
+<a style="display:block;padding-left:8px" href="dts_contrast.html" class="left-sidebar-link ">DTS 对比</a>
+<a style="display:block;padding-left:8px" href="dts_assessment.html" class="left-sidebar-link ">DTS 评估</a>
+<a style="display:block;padding-left:8px" href="dts_convert.html" class="left-sidebar-link ">DTS 转换</a>
+<a style="display:block;padding-left:8px" href="metadata_management.html" class="left-sidebar-link ">元数据管理</a>
+<a style="display:block;padding-left:8px" href="job_scheduling.html" class="left-sidebar-link ">作业调度</a>
+<a style="display:block;padding-left:8px" href="migration_practice_from_oracle_to_dm.html" class="left-sidebar-link ">从 ORACLE 到 DM 迁移实践</a>
+<a style="display:block;padding-left:8px" href="default_driver_information.html" class="left-sidebar-link ">附录1 默认驱动信息</a>
+<a style="display:block;padding-left:8px" href="default_mapping_relationships.html" class="left-sidebar-link ">附录2 迁移默认类型映射关系</a></div>
+          </div>
+          <div class="bar-border"></div>
+        <script>
+
+  function isOpenWeb(group) {
+    const children = Array.from(group.children[1].children)
+    const isOpenStatus = children.map(function (element) {
+      if (element.className.indexOf('left-sidebar-link-group') >= 0) {
+        return isOpenWeb(element)
+      } else {
+        if (element.className.indexOf('current') >= 0) {
+          return true
+        } else {
+          return false
+        }
+      }
+    }).reduce((a, b) => a || b, false)
+
+
+    if (isOpenStatus) {
+      if (group.className.indexOf('top') >= 0)
+        group.className = 'left-sidebar-link-group top open'
+      else
+        group.className = 'left-sidebar-link-group open'
+    }else{
+      if (group.className.indexOf('top') >= 0)
+        group.className = 'left-sidebar-link-group top '
+      else
+        group.className = 'left-sidebar-link-group'
+    }
+
+    return isOpenStatus
+  }
+
+  function calcuHeightWeb(group){
+    const link = group.children[0]
+    const div = group.children[1]
+    let  h = link.offsetHeight
+
+    if(group.className.indexOf('open')<0){
+
+    }else{
+      const cheight =  Array.from(div.children).map(element=>{
+        if (element.className.indexOf('left-sidebar-link-group') >= 0) {
+          return calcuHeightWeb(element)
+        } else {
+          return (element.offsetHeight)
+        }
+      }).reduce((a,b)=>a+b,0)
+
+      h = h + cheight
+    }
+
+    group.style.height = h + 'px'
+
+    return h
+  }
+
+  window.onload=function(){
+    // left sider display block
+
+    Array.from(document.querySelectorAll('.left-sidebar-link-group.top')).forEach(v=>{
+      v.style.display = "block";
+      v.nextElementSibling.style.display = "inherit"
+    })
+
+    Array.from(document.querySelectorAll('.left-sidebar-link-group.top')).forEach(v=>{
+      isOpenWeb(v)})
+
+    Array.from(document.querySelectorAll('.left-sidebar-link-group.top')).forEach(v=>{
+      calcuHeightWeb(v)})
+
+    Array.from(document.querySelectorAll('.left-sidebar-link')).forEach(v=>{
+      if(v.parentElement.className.indexOf('side-mobile-nav-link-group')>=0){
+        v.parentElement.classList.replace('side-mobile-nav-link-group','left-sidebar-link-group')
+      }
+    })
+
+  }
+
+  </script>
+    
+  <script>
+  document.querySelectorAll('.sidebar-title.left-siderbar').forEach(v=>v.onclick=()=>{
+    if(v.className.indexOf('open') >= 0){
+      v.className="sidebar-title left-siderbar"
+      v.nextElementSibling.style.height="0"
+    }else{      
+      {        
+        var x = document.querySelectorAll(".sidebar-title.left-siderbar");
+        var i;
+        for (i = 0; i < x.length; i++) {
+          x[i].nextElementSibling.style.height = "0";
+        }
+      }
+      v.className="sidebar-title left-siderbar open";
+      v.nextElementSibling.style.height = v.nextElementSibling.children.length * 28 +"px";
+    }
+  })
+  document.querySelectorAll('.sidebar-subtitle.second-menu').forEach(v=>v.onclick=()=>{
+    // 关闭
+    if(v.className.indexOf('expanded') >= 0){
+      v.className = "sidebar-subtitle second-menu"; 
+      v.parentElement.style.height = "28px";
+      v.parentElement.parentElement.style.height = v.parentElement.parentElement.children.length  * 28 +"px";
+
+
+    }else{
+      // 其他全部折叠，展开当前
+      {        
+        var x = document.querySelectorAll(".sidebar-subtitle.second-menu");
+        var i;
+        for (i = 0; i < x.length; i++) {
+          x[i].parentElement.style.height = "28px";
+          x[i].className = "sidebar-subtitle second-menu";
+        }
+      }
+      v.className="sidebar-subtitle second-menu expanded";
+      v.parentElement.style.height = (v.nextElementSibling.children.length +1) * 28 + "px";
+      
+      v.parentElement.parentElement.style.height = (v.nextElementSibling.children.length + v.parentElement.parentElement.children.length) * 28 +"px";
+    }
+  });
+  </script>
+  </div>
+</aside>
+      <article class="article-container" itemscope itemtype="http://schema.org/Article">
+        <div class="article-inner">
+          <div class="article" style=" margin-top:24px;">
+            <div>
+              <header class="article-header">
+                <h1 class="article-title" itemprop="name">通信加密</h1>
+              </header>
+              <div class="article-content vditor-reset" itemprop="articleBody" >
+                <div>
+<p>DM 提供两种通信加密方式：一基于传输层的 SSL 协议加密；二基于应用层的消息包加密。两个层次的加密互不影响，可以同时使用。因为任何一种加密方式都足够安全，而且双重加密会占用更多的数据库资源，所以通常情况下，没必要同时开启这两种加密。</p>
+<p>当未采用通信加密时，为了提高安全性，数据库系统自动对登录消息中的用户名密码使用内部算法进行了简单的加解密操作，这里的简单加解密操作为使用 AES256_CFB 算法加解密。如果用户需要对用户名密码进行增强加密，请参考 <a target="_blank" rel="noopener external nofollow noreferrer" href="https://eco.dameng.com/document/dm/zh-cn/pm/user-name-password.html">11 登录用户名密码增强加密</a>。</p>
+<p>下面对基于传输层的 SSL 协议加密和基于应用层的消息包加密进行详细介绍。</p>
+<h2 id="6-1-基于传输层的SSL协议加密" class="article-heading">6.1 基于传输层的 SSL 协议加密<a class="article-anchor" href="#6-1-基于传输层的SSL协议加密" aria-hidden="true"></a></h2>
+<p>选择是否使用 SSL 协议加密以 DM 数据库服务器端的设置为准，即通过设置服务器配置文件 DM.INI 中的 ENABLE_ENCRYPT 参数来指定，客户端以服务器采用的通信方式与其进行通信。</p>
+<p>ENABLE_ENCRYPT 取值 0、1、2、4 或 5。0：不开启 SSL 加密和 SSL 认证；1：开启 SSL 加密和 SSL 认证；2：开启 SSL 认证但不开启 SSL 加密；4：开启 SSL 加密不开启 SSL 认证；5：开启 SSL 加密和对服务端的 SSL 单向认证。缺省值为 0。不论设置为 1、2、4 或 5，它内部所使用的密码套件是 SSL 协议自动协商的，达梦未进行任何干涉。</p>
+<p>系统管理员可通过查询 V$PARAMETER 动态视图查询 ENABLE_ENCRYPT 的当前值。</p>
+<pre><code class="language-plaintext">SELECT * FROM V$PARAMETER WHERE NAME='ENABLE_ENCRYPT';
+</code></pre>
+<p>也可以通过使用客户端工具 Console 或调用系统过程 SP_SET_PARA_VALUE 重新设置 ENABLE_ENCRYPT 的值。不过由于这个参数都为静态 INI 参数，修改后需要重启 DM 数据库服务器才能生效。</p>
+<pre><code class="language-plaintext">SP_SET_PARA_VALUE (2,'ENABLE_ENCRYPT',1);
+</code></pre>
+<p>另外，DM.INI 中的 MIN_SSL_VERSION 参数指定了允许连接的 SSL 最低版本，此参数设置仅当 ENABLE_ENCRYPT 不为 0 时有效。MIN_SSL_VERSION 的可取值包括：</p>
+<ul>
+<li>0：所有版本</li>
+<li>0x0301：TLSv1</li>
+<li>0x0302：TLSv1.1</li>
+<li>0x0303：TLSv1.2</li>
+<li>0x0304：TLSv1.3</li>
+</ul>
+<p>MIN_SSL_VERSION 缺省为 0，为静态 INI 参数，修改后需要重启 DM 数据库服务器才能生效。</p>
+<p>当选择仅 SSL 加密时，不需要提供证书。当选择 SSL 加密和认证时，需要在 DM 数据库服务器所在目录下的 server_ssl 子目录中存放 CA 的证书、服务器的证书和服务器的密钥，同时在客户端所在目录下的 client_ssl 子目录中存放 CA 的证书、客户端的证书和客户端的密钥，这样服务器和客户端的通信即是建立在加密的 SSL 连接之上的。此时如果没有配置好 SSL 环境，则通讯仍旧不加密。</p>
+<p>当选择 SSL 加密与单向认证时，进行通信加密，仅对服务器端证书进行校验。客户端不需要提供证书。</p>
+<p>当选择 SSL 认证时，不进行通信加密，只是检查客户端和服务器的证书是否匹配。此时如果服务器 SSL 环境没有配置则服务器无法正常启动，如果客户端 SSL 环境没有配置则无法连接服务器。</p>
+<h2 id="6-2-基于应用层的消息包加密" class="article-heading">6.2 基于应用层的消息包加密<a class="article-anchor" href="#6-2-基于应用层的消息包加密" aria-hidden="true"></a></h2>
+<p>选择是否使用基于应用层的消息包加密以 DM 数据库服务器端的设置为准，即通过设置服务器配置文件 DM.INI 中的 COMM_ENCRYPT_NAME 参数来指定，客户端以服务器采用的通信方式与其进行通信。</p>
+<p>COMM_ENCRYPT_NAME 取值空串、算法名分别代表不加密、加密。缺省为空串。算法名可以通过查询动态视图 V$CIPHERS 获取。本节的算法名必须为分组加密算法或流加密算法(即 CYT_TYPE 为 1 或 2)，且不为非填充模式（即 WORK_MODE 不能是 ECB_NOPAD 或 CBC_NOPAD）。当算法名写错，则使用加密算法 AES256_CFB。应用层加密的密钥是通过 DH 密钥交换算法协商生成。</p>
+<p>用户可通过 V$CIPHERS 动态视图查询达梦支持的 COMM_ENCRYPT_NAME 算法名。</p>
+<pre><code class="language-plaintext">SELECT CYT_NAME FROM V$CIPHERS WHERE (CYT_TYPE=1 OR CYT_TYPE=2 ) AND （WORK_MODE!='ECB_NOPAD' AND WORK_MODE!='CBC_NOPAD'）;
+</code></pre>
+<p>用户可通过 V$PARAMETER 动态视图查询 COMM_ENCRYPT_NAME 的当前值。</p>
+<pre><code class="language-plaintext">SELECT * FROM V$PARAMETER WHERE NAME='COMM_ENCRYPT_NAME';
+</code></pre>
+<p>也可以通过使用客户端工具 Console 或调用系统过程 SP_SET_PARA_STRING_VALUE 重新设置 COMM_ENCRYPT_NAME 的值。不过由于这个参数都为静态 INI 参数，修改后需要重启 DM 数据库服务器才能生效。</p>
+<pre><code class="language-plaintext">SP_SET_PARA_STRING_VALUE(2,'COMM_ENCRYPT_NAME','DES_OFB');
+</code></pre>
+
+</div>
+
+              </div>
+              <footer class="article-footer">
+                <time class="article-footer-updated" datetime="2026-05-06T05:03:22.766Z" itemprop="dateModified">上次更新：2026-05-06</time>
+                <a href="audit.html" class="article-footer-prev" title="审计"><svg class="icon" style="font-size:16px" aria-hidden="true"><use xlink:href="#icon-arrow-left"></use></svg><span>上一篇</span></a><a href="storage-encryption.html" class="article-footer-next" title="存储加密"><span>下一篇</span><svg class="icon" style="font-size:16px" aria-hidden="true"><use xlink:href="#icon-arrow-right"></use></svg></a>
+              </footer>
+              
+<section id="comments">
+  <div id="disqus_thread"></div>
+</section>
+</article>
+</body>
+</html>

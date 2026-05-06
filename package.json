@@ -1,6 +1,6 @@
 {
   "name": "basedoc-dameng-mcp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "面向达梦数据库 (DM8) 的只读 MCP 服务：受限 SQL 查询 + 本地 Markdown 手册离线全文检索（list_manuals / list_sections / read_section / lookup_docs）。",
   "type": "module",
   "license": "MIT",
@@ -24,7 +24,8 @@
     "documentation"
   ],
   "bin": {
-    "basedoc-dameng-mcp": "dist/server.js"
+    "basedoc-dameng-mcp": "dist/server.js",
+    "basedoc-dameng-fetch-docs": "dist/bin-fetch.js"
   },
   "main": "dist/server.js",
   "files": [
@@ -33,7 +34,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json && chmod +x dist/server.js",
+    "build": "tsc -p tsconfig.json && chmod +x dist/server.js dist/bin-fetch.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "start": "node dist/server.js",
@@ -42,10 +43,12 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.29.0",
     "dmdb": "1.0.48286",
+    "turndown": "7.2.4",
     "zod": "4.4.3"
   },
   "devDependencies": {
     "@types/node": "22.10.2",
+    "@types/turndown": "5.0.6",
     "typescript": "5.7.2",
     "vitest": "2.1.8"
   },
