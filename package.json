@@ -1,0 +1,55 @@
+{
+  "name": "basedoc-dameng-mcp",
+  "version": "0.1.0",
+  "description": "Read-only MCP server for Dameng (DM8): SQL whitelist + local Markdown manual search (list_manuals / list_sections / read_section / lookup_docs).",
+  "type": "module",
+  "license": "MIT",
+  "author": "bravejack",
+  "homepage": "https://github.com/bravejack/basedoc-dameng-mcp#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bravejack/basedoc-dameng-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bravejack/basedoc-dameng-mcp/issues"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "dameng",
+    "dm8",
+    "claude",
+    "anthropic",
+    "database",
+    "documentation"
+  ],
+  "bin": {
+    "basedoc-dameng-mcp": "dist/server.js"
+  },
+  "main": "dist/server.js",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json && chmod +x dist/server.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "start": "node dist/server.js",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.29.0",
+    "dmdb": "1.0.48286",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.2",
+    "typescript": "5.7.2",
+    "vitest": "2.1.8"
+  },
+  "engines": {
+    "node": ">=20.10"
+  }
+}
