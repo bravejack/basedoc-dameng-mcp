@@ -1,4 +1,28 @@
 #!/usr/bin/env node
+// Self-relaunch with --openssl-legacy-provider so dmdb's login handshake works
+// on Node >= 17 (OpenSSL 3 disabled the algos dmdb relies on by default).
+// Set DAMENG_NO_LEGACY_OPENSSL=1 to skip this, or invoke node directly with
+// the flag already set.
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+
+const haveLegacyFlag =
+  process.execArgv.some((a) => a.includes("openssl-legacy-provider")) ||
+  (process.env.NODE_OPTIONS ?? "").includes("openssl-legacy-provider");
+
+if (!haveLegacyFlag && !process.env.DAMENG_NO_LEGACY_OPENSSL) {
+  const r = spawnSync(
+    process.execPath,
+    [
+      "--openssl-legacy-provider",
+      fileURLToPath(import.meta.url),
+      ...process.argv.slice(2),
+    ],
+    { stdio: "inherit" },
+  );
+  process.exit(r.status ?? 1);
+}
+
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
@@ -63,14 +87,22 @@ async function main() {
     throw e;
   }
 
-  const db = new Database(config);
-  await db.connect();
+  const hasDb = config.host.length > 0 && config.port > 0;
+  const db = hasDb ? new Database(config) : null;
+  if (db) {
+    await db.connect();
+  } else {
+    console.error("[dameng-mcp] no DB credentials — docs-only mode");
+  }
 
   const server = new McpServer({
     name: "dameng-mcp",
     version: "0.1.0",
   });
 
+  // --- DB tools (only when connected) ---
+
+  if (db) {
   server.registerTool(
     "query",
     {
@@ -301,13 +333,17 @@ async function main() {
     },
   );
 
+  } // end if (db) block for DB tools
+
+  // --- Docs tools (always available when DOCS_ROOT is set) ---
+
   const shutdown = async (signal: string) => {
     console.error(`[dameng-mcp] received ${signal}, shutting down`);
     try {
       await server.close();
     } catch {}
     try {
-      await db.close();
+      if (db) await db.close();
     } catch {}
     process.exit(0);
   };

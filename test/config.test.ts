@@ -81,10 +81,17 @@ describe("loadConfig", () => {
     },
   );
 
-  test("does NOT default the password to SYSDBA or anything else", () => {
-    const env = { ...baseEnv } as Record<string, string>;
-    delete env.DAMENG_PASSWORD;
-    expect(() => loadConfig(env)).toThrow(/DAMENG_PASSWORD/);
+  test("does NOT default the password to SYSDBA or anything else (docs-only path)", () => {
+    // In docs-only mode (no DB env), password must remain unset — never
+    // fall back to a hardcoded value like SYSDBA. The DB tools simply aren't
+    // registered in this case.
+    const cfg = loadConfig({ DAMENG_DOCS_ROOT: "/opt/dameng/docs" });
+    expect(cfg.password).toBe("");
+    expect(cfg.host).toBe("");
+  });
+
+  test("requires either full DB env OR DAMENG_DOCS_ROOT", () => {
+    expect(() => loadConfig({})).toThrow(/DOCS_ROOT|credentials/);
   });
 
   test("rejects non-numeric port", () => {

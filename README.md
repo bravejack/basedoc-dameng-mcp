@@ -31,14 +31,24 @@ npm install
 npm run build
 ```
 
+## Modes
+
+The server supports two run modes, picked automatically from env vars:
+
+- **DB + docs mode** (set both DB credentials and `DAMENG_DOCS_ROOT`): all 8 tools registered.
+- **Docs-only mode** (set only `DAMENG_DOCS_ROOT`, no DB credentials): just the 4 docs tools — useful when you want to ship Dameng manuals to an LLM without exposing the database.
+- (DB-only mode also works if you set DB creds without `DAMENG_DOCS_ROOT`.)
+
+Server fails fast (exit 2) if neither set is provided.
+
 ## Configuration (env vars)
 
 | Variable | Required | Default | Notes |
 |---|---|---|---|
-| `DAMENG_HOST` | yes | — | e.g. `dameng.example.com` |
-| `DAMENG_PORT` | yes | — | e.g. `5236` |
-| `DAMENG_USER` | yes | — | low-privilege account |
-| `DAMENG_PASSWORD` | yes | — | no fallback |
+| `DAMENG_HOST` | for DB | — | e.g. `dameng.example.com` |
+| `DAMENG_PORT` | for DB | — | e.g. `5236` |
+| `DAMENG_USER` | for DB | — | low-privilege account |
+| `DAMENG_PASSWORD` | for DB | — | no fallback |
 | `DAMENG_SCHEMA` | no | — | default schema for `list_tables` / `describe_table` |
 | `DAMENG_QUERY_TIMEOUT_MS` | no | `10000` | per-query timeout |
 | `DAMENG_MAX_ROWS` | no | `1000` | hard cap on returned rows |
@@ -47,6 +57,7 @@ npm run build
 | `DAMENG_DOCS_ROOT` | no | — | absolute path to a directory of Markdown manuals. Enables the docs tools. |
 | `DAMENG_DOCS_INCLUDE` | no | — | comma-separated top-level dir patterns to include (glob `*` supported). Recommended: `DM8-*` to scope to official manuals only. |
 | `DAMENG_DOCS_EXCLUDE` | no | — | comma-separated top-level dir patterns to exclude. `node_modules` is always excluded. |
+| `DAMENG_NO_LEGACY_OPENSSL` | no | unset | Set to `1` to skip the auto-relaunch with `--openssl-legacy-provider` (only useful if your dmdb build doesn't need it). |
 
 ## Tools
 
@@ -107,6 +118,10 @@ Tests cover the SQL guard (rejection rules, comment stripping, multi-statement d
 - No `execute_sql` / no DML / no DDL. If you need writes, write them directly with `dmctl`/JDBC, not through an LLM.
 - No HTTP transport. stdio only — no inbound network surface.
 - No automatic schema introspection on startup. Tools query system views on demand.
+
+## Why does the binary self-relaunch?
+
+`dmdb`'s login handshake uses encryption algorithms OpenSSL 3 disabled by default in Node 17+. Without `--openssl-legacy-provider` you get `[6071] 消息加密失败` / `error:0308010C`. Rather than asking every user to set `NODE_OPTIONS=--openssl-legacy-provider`, the bin re-execs itself with the flag on first start. Cost is one extra ~50 ms Node startup. Opt out with `DAMENG_NO_LEGACY_OPENSSL=1`.
 
 ## Known transitive vulnerabilities
 
