@@ -1,7 +1,7 @@
 {
   "name": "basedoc-dameng-mcp",
   "version": "0.1.1",
-  "description": "Read-only MCP server for Dameng (DM8): SQL whitelist + local Markdown manual search (list_manuals / list_sections / read_section / lookup_docs).",
+  "description": "面向达梦数据库 (DM8) 的只读 MCP 服务：受限 SQL 查询 + 本地 Markdown 手册离线全文检索（list_manuals / list_sections / read_section / lookup_docs）。",
   "type": "module",
   "license": "MIT",
   "author": "bravejack",
